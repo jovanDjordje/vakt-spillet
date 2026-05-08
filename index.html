@@ -478,6 +478,45 @@ html, body {
 }
 .btn-secondary:hover { border-color: var(--cream); color: var(--cream); }
 
+/* ── FEEDBACK FORM ── */
+.feedback-section {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.feedback-textarea {
+  width: 100%;
+  background: var(--mid);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  padding: 0.8rem;
+  resize: none;
+  height: 90px;
+  margin: 0.8rem 0;
+  line-height: 1.5;
+}
+.feedback-textarea:focus { outline: none; border-color: var(--teal); }
+.feedback-textarea::placeholder { color: var(--muted); }
+
+.feedback-sent {
+  text-align: center;
+  padding: 1.2rem;
+  color: var(--green);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  background: var(--panel);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(45,198,83,0.2);
+}
+
 /* ── PROGRESS DOTS ── */
 .progress-dots {
   display: flex;
@@ -562,6 +601,14 @@ html, body {
     <div class="value-item"><div class="value-dot"></div><div>Vi river siloer mellom systemer som aldri burde vært adskilte</div></div>
     <div class="value-item"><div class="value-dot"></div><div>Resultatet er ikke teknologi — det er tid tilbake til pasientene</div></div>
   </div>
+
+  <div class="feedback-section" id="feedbackSection">
+    <div class="values-title">DIN TILBAKEMELDING</div>
+    <p style="font-size:0.78rem;color:var(--muted);line-height:1.5;">Ønsker, tanker eller spørsmål? Vi leser alt.</p>
+    <textarea class="feedback-textarea" id="feedbackText" placeholder="Skriv her..."></textarea>
+    <button class="btn-primary" style="width:100%" onclick="submitFeedback(this)">Send inn →</button>
+  </div>
+  <div id="feedbackDone" class="feedback-sent" style="display:none">✓ TAKK — VI HAR MOTTATT DIN TILBAKEMELDING</div>
 
   <div class="replay-row">
     <button class="btn-secondary" onclick="startGame('old')">Spill 2022</button>
@@ -785,8 +832,32 @@ function nextScene() {
   }
 }
 
+async function submitFeedback(btn) {
+  const text = document.getElementById('feedbackText').value.trim();
+  if (!text) return;
+  btn.disabled = true;
+  btn.textContent = 'Sender...';
+  try {
+    await fetch('/api/submit-feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        year: currentYear,
+        stress_final: Math.min(100, stress),
+        time_wasted: timeWasted,
+        feedback: text
+      })
+    });
+  } catch(e) {}
+  document.getElementById('feedbackSection').style.display = 'none';
+  document.getElementById('feedbackDone').style.display = 'block';
+}
+
 function showEndScreen() {
   showScreen('endscreen');
+  document.getElementById('feedbackSection').style.display = 'block';
+  document.getElementById('feedbackDone').style.display = 'none';
+  document.getElementById('feedbackText').value = '';
 
   const isOld = currentYear === 'old';
 
