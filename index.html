@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>En vakt på sykehuset</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap');
+
+:root {
+  --dark: #0a0f14;
+  --mid: #111820;
+  --panel: #161e27;
+  --teal: #0a9396;
+  --teal-dim: #064e51;
+  --amber: #ee9b00;
+  --red: #ae2012;
+  --green: #2dc653;
+  --cream: #e8e0d0;
+  --muted: rgba(232,224,208,0.4);
+  --mono: 'DM Mono', monospace;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--dark);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCREENS ── */
+.screen {
+  display: none;
+  min-height: 100vh;
+  flex-direction: column;
+  padding: 0;
+  animation: fadeIn 0.4s ease;
+}
+.screen.active { display: flex; }
+@keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+
+/* ── INTRO ── */
+#intro {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+#intro::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(10,147,150,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 20%, rgba(238,155,0,0.07) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.time-badge {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--teal);
+  letter-spacing: 0.15em;
+  border: 1px solid var(--teal-dim);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+}
+
+.intro-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2rem, 8vw, 3rem);
+  font-weight: 800;
+  line-height: 1.05;
+  margin-bottom: 1rem;
+}
+
+.intro-title .dim { color: var(--muted); }
+.intro-title .bright { color: #fff; }
+.intro-title .accent { color: var(--amber); }
+
+.intro-sub {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 300px;
+  margin: 0 auto 2.5rem;
+}
+
+.intro-meta {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  letter-spacing: 0.08em;
+}
+
+.btn-primary {
+  background: var(--teal);
+  color: var(--dark);
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 8px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-block;
+}
+.btn-primary:hover { background: var(--amber); transform: translateY(-2px); }
+
+/* ── YEAR SELECTOR ── */
+#yearsel {
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.yearsel-label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  margin-bottom: 1.5rem;
+}
+
+.yearsel-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.yearsel-sub {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+.year-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  width: 100%;
+  max-width: 380px;
+}
+
+.year-card {
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.year-card:hover { transform: translateY(-3px); }
+
+.year-card.old { border-color: rgba(174,32,18,0.3); }
+.year-card.old:hover { border-color: var(--red); background: rgba(174,32,18,0.08); }
+
+.year-card.new { border-color: rgba(10,147,150,0.3); }
+.year-card.new:hover { border-color: var(--teal); background: rgba(10,147,150,0.08); }
+
+.year-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+}
+.year-card.old .year-num { color: var(--red); }
+.year-card.new .year-num { color: var(--teal); }
+
+.year-desc {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ── GAME SCREEN ── */
+#game {
+  flex-direction: column;
+}
+
+.game-header {
+  background: var(--panel);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.game-year-badge {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+}
+.game-year-badge.old { color: var(--red); }
+.game-year-badge.new { color: var(--teal); }
+
+.game-clock {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--amber);
+}
+
+.stress-bar-wrap {
+  padding: 0 1rem;
+  margin-top: 0.6rem;
+}
+.stress-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.3rem;
+  display: flex;
+  justify-content: space-between;
+}
+.stress-bar {
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.stress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease, background 0.5s;
+}
+
+.scene-area {
+  flex: 1;
+  padding: 1.2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.situation-card {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 1.2rem;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.sit-tag {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+  color: var(--muted);
+}
+
+.sit-text {
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--cream);
+}
+
+.sit-text .highlight { color: var(--amber); font-style: italic; }
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.choice-btn {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--cream);
+  padding: 0.9rem 1rem;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  width: 100%;
+}
+
+.choice-btn:hover {
+  border-color: var(--teal);
+  background: rgba(10,147,150,0.08);
+}
+
+.choice-btn:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.choice-btn.chosen-good {
+  border-color: var(--green);
+  background: rgba(45,198,83,0.08);
+  color: var(--green);
+}
+
+.choice-btn.chosen-bad {
+  border-color: var(--red);
+  background: rgba(174,32,18,0.08);
+  color: #ff8a7a;
+}
+
+.feedback-box {
+  background: var(--mid);
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  border-left: 3px solid var(--teal);
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.feedback-box.bad { border-color: var(--red); }
+.feedback-box.good { border-color: var(--green); }
+
+.feedback-time {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+.next-btn {
+  background: transparent;
+  border: 1px solid rgba(10,147,150,0.4);
+  color: var(--teal);
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+  display: none;
+  width: 100%;
+}
+.next-btn:hover { background: rgba(10,147,150,0.1); }
+
+/* ── END SCREEN ── */
+#endscreen {
+  justify-content: flex-start;
+  padding: 2rem 1.5rem;
+}
+
+.end-header {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--teal);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.end-verdict {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.6rem, 6vw, 2.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.end-summary {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+
+.stat-box {
+  background: var(--panel);
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.stat-num.good { color: var(--green); }
+.stat-num.bad { color: var(--red); }
+.stat-num.teal { color: var(--teal); }
+
+.stat-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+.values-reveal {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(10,147,150,0.2);
+}
+
+.values-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.8rem;
+}
+
+.value-item {
+  display: flex;
+  gap: 0.7rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  align-items: flex-start;
+}
+.value-item:last-child { border-bottom: none; }
+.value-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.replay-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--muted);
+  padding: 0.9rem;
+  border-radius: 8px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.btn-secondary:hover { border-color: var(--cream); color: var(--cream); }
+
+/* ── PROGRESS DOTS ── */
+.progress-dots {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0 1rem 0.8rem;
+}
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  transition: background 0.3s;
+}
+.dot.done { background: var(--teal); }
+.dot.current { background: var(--amber); }
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="intro" class="screen active">
+  <div class="time-badge">🏥 NATTEVAKT · 22:47</div>
+  <h1 class="intro-title">
+    <span class="dim">En vakt</span><br>
+    <span class="bright">på</span><br>
+    <span class="accent">sykehuset</span>
+  </h1>
+  <p class="intro-sub">Du er sykepleier. Du har 8 pasienter. Det er natt. Velg hvordan vakten utspiller seg.</p>
+  <p class="intro-meta">5 MIN · INTERAKTIV FORTELLING · NORSK</p>
+  <button class="btn-primary" onclick="showScreen('yearsel')">Start vakten →</button>
+</div>
+
+<!-- YEAR SELECT -->
+<div id="yearsel" class="screen">
+  <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:2rem 1.5rem; text-align:center;">
+    <p class="yearsel-label">VELG DIN VIRKELIGHET</p>
+    <h2 class="yearsel-title">Hvilket år er du på vakt?</h2>
+    <p class="yearsel-sub">Samme sykehus. Samme pasienter.<br>Veldig forskjellig natt.</p>
+    <div class="year-cards">
+      <div class="year-card old" onclick="startGame('old')">
+        <div class="year-num">2022</div>
+        <div class="year-desc">Systemer som ikke snakker sammen</div>
+      </div>
+      <div class="year-card new" onclick="startGame('new')">
+        <div class="year-num">2025</div>
+        <div class="year-desc">Prosessplattformen er på plass</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="game-header">
+    <div class="game-year-badge" id="yearBadge">2022</div>
+    <div class="game-clock" id="gameClock">22:47</div>
+  </div>
+  <div class="stress-bar-wrap">
+    <div class="stress-label">
+      <span id="stressLabel">STRESSNIVÅ</span>
+      <span id="stressVal">0%</span>
+    </div>
+    <div class="stress-bar">
+      <div class="stress-fill" id="stressFill" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="progress-dots" id="progressDots"></div>
+  <div class="scene-area" id="sceneArea"></div>
+</div>
+
+<!-- END -->
+<div id="endscreen" class="screen">
+  <div class="end-header" id="endHeader">VAKTEN ER OVER</div>
+  <h2 class="end-verdict" id="endVerdict">—</h2>
+  <p class="end-summary" id="endSummary">—</p>
+
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <div class="values-reveal">
+    <div class="values-title">DETTE ER DERFOR VI BYGGER DET</div>
+    <div class="value-item"><div class="value-dot"></div><div>Vi nekter å akseptere at teknologi skal gjøre jobben vanskeligere</div></div>
+    <div class="value-item"><div class="value-dot"></div><div>Vi bygger for sykepleieren på nattevakt — ikke for PowerPoint-presentasjonen</div></div>
+    <div class="value-item"><div class="value-dot"></div><div>Vi river siloer mellom systemer som aldri burde vært adskilte</div></div>
+    <div class="value-item"><div class="value-dot"></div><div>Resultatet er ikke teknologi — det er tid tilbake til pasientene</div></div>
+  </div>
+
+  <div class="replay-row">
+    <button class="btn-secondary" onclick="startGame('old')">Spill 2022</button>
+    <button class="btn-secondary" onclick="startGame('new')">Spill 2025</button>
+  </div>
+  <br>
+  <button class="btn-primary" style="width:100%" onclick="showScreen('yearsel')">Prøv det andre året →</button>
+</div>
+
+<script>
+const scenarios = {
+  old: [
+    {
+      time: "22:47",
+      tag: "SITUASJON 1 · INNLOGGING",
+      text: "Du starter vakten. Du trenger tilgang til pasientjournaler, medisinsystemet og arbeidsplanen. Tre forskjellige systemer. Tre forskjellige passord.",
+      choices: [
+        { text: "Logg inn i alle tre — ett om gangen", good: false, feedback: "Du bruker 14 minutter på innlogging og passordproblemer. System 2 har tidsavbrutt. Du starter på nytt. En kollega venter på informasjon du ikke har funnet ennå.", time: "+14 min · Stressnivå opp" },
+        { text: "Bruk post-it-lappen med passordene på skjermen", good: false, feedback: "Det funker — denne gangen. Men det er ikke akkurat GDPR-vennlig. Og neste uke bytter IT passordene uansett.", time: "+8 min · Sikkerhetsrisiko" }
+      ]
+    },
+    {
+      time: "23:15",
+      tag: "SITUASJON 2 · PASIENTINFO",
+      text: "Pasient på rom 4 skal ha medisin. Du trenger å sjekke allergier fra forrige innleggelse på et annet sykehus. Informasjonen finnes — men ikke her.",
+      choices: [
+        { text: "Ring nattevakten på det andre sykehuset", good: false, feedback: "Du venter 11 minutter. Sykepleieren der finner det til slutt i et gammelt papirarkiv. Pasienten har ventet på smertestillende hele tiden.", time: "+11 min · Pasient venter" },
+        { text: "Spør pasienten selv om allergier", good: false, feedback: "Pasienten husker ikke nøyaktig. Du dokumenterer det som uavklart og gir ikke medisinen denne runden. Det er det tryggeste — men ikke det beste.", time: "+5 min · Usikkerhet" }
+      ]
+    },
+    {
+      time: "23:58",
+      tag: "SITUASJON 3 · DOBBELTREGISTRERING",
+      text: "Du har oppdatert en pasients status. Nå må det samme inn i tre systemer — journal, medisinsystem og avdelingslogg. Manuelt.",
+      choices: [
+        { text: "Skriv det inn i alle tre systemene", good: false, feedback: "22 minutter. Du skriver det samme tre ganger. I det tredje systemet oppdager du at noen har lagt inn feil informasjon fra i går. Du må rette opp. Telefonen ringer.", time: "+22 min · Frustrasjon" },
+        { text: "Oppdater bare journalen — de andre kan vente", good: false, feedback: "Neste vakt finner inkonsekvente opplysninger. Det tar en time å rydde opp. Du vet ikke at det skjer — du sover.", time: "+3 min nå, +60 min for neste vakt" }
+      ]
+    },
+    {
+      time: "01:30",
+      tag: "SITUASJON 4 · ALARM",
+      text: "Alarm fra rom 7. Du løper dit. Pasienten er ok — men trenger ekstra oppfølging. Du trenger å varsle legen og oppdatere behandlingsplanen.",
+      choices: [
+        { text: "Ring legen, oppdater begge systemer manuelt", good: false, feedback: "Legen trenger informasjon fra to systemer du ikke har åpne. Du leser opp fra skjerm, han noterer på papir. Han sier han oppdaterer journalen selv. Han glemmer det.", time: "+18 min · Koordineringsfeil" },
+        { text: "Send melding i systemet og håp at legen ser det", good: false, feedback: "Legen bruker et annet system. Meldingen havner i en innboks han sjekker morgen. Du finner ut ved 06:00.", time: "+2 min nå, problem oppdages ved 06:00" }
+      ]
+    },
+    {
+      time: "05:45",
+      tag: "SITUASJON 5 · VAKTSKIFTE",
+      text: "Vakten er snart over. Du skal overleverere til dagvakten. Du har informasjon spredt over tre systemer, noen papirlapper og hukommelsen.",
+      choices: [
+        { text: "Muntlig gjennomgang av alle 8 pasienter", good: false, feedback: "35 minutter. Du er utslitt og glemmer to viktige detaljer. Dagvakten oppdager dem — heldigvis — etter en time.", time: "+35 min · Kritisk info nesten tapt" },
+        { text: "Send en e-post med oppsummeringen", good: false, feedback: "E-posten er ufullstendig fordi du ikke orker å lete opp alt fra alle systemene. Du håper dagvakten spør hvis noe er uklart.", time: "+20 min · Ufullstendig overleveringn" }
+      ]
+    }
+  ],
+  new: [
+    {
+      time: "22:47",
+      tag: "SITUASJON 1 · INNLOGGING",
+      text: "Du starter vakten. Du trenger tilgang til pasientjournaler, medisinsystemet og arbeidsplanen.",
+      choices: [
+        { text: "Logg inn med din ene brukerkonto", good: true, feedback: "Én innlogging. Alt er der. Pasientliste, medisiner, arbeidsplan — alt i ett grensesnitt. Du er klar på 90 sekunder.", time: "+1.5 min · Stress: null" },
+        { text: "Sjekk at alt ser riktig ut før du starter", good: true, feedback: "Du bruker 2 minutter på å bekrefte at alt er oppdatert fra forrige vakt. Det er. Du starter trygt.", time: "+2 min · Full oversikt" }
+      ]
+    },
+    {
+      time: "22:55",
+      tag: "SITUASJON 2 · PASIENTINFO",
+      text: "Pasient på rom 4 skal ha medisin. Du trenger å sjekke allergier fra forrige innleggelse på et annet sykehus.",
+      choices: [
+        { text: "Slå opp i pasientprofilen", good: true, feedback: "Alt er der. Allergier, tidligere innleggelser, nåværende medisiner — samlet fra alle relevante systemer. Du gir medisinen trygt. Pasienten slipper å vente.", time: "+2 min · Trygg og rask" },
+        { text: "Dobbeltsjekk med den automatiske varslingen", good: true, feedback: "Systemet har allerede flagget en mulig interaksjon mellom to medisiner. Du ser det, ringer legen, justerer dosen. Det kunne gått galt.", time: "+4 min · Potensielt liv reddet" }
+      ]
+    },
+    {
+      time: "23:20",
+      tag: "SITUASJON 3 · OPPDATERING",
+      text: "Du har oppdatert en pasients status. Det skal reflekteres i journal, medisinsystem og avdelingslogg.",
+      choices: [
+        { text: "Oppdater én gang i plattformen", good: true, feedback: "Én oppdatering. Systemet synkroniserer automatisk til alle relevante steder. 90 sekunder. Du er ferdig.", time: "+1.5 min · Ingen dobbeltregistrering" },
+        { text: "Sjekk at synkroniseringen gikk ok", good: true, feedback: "Grønt lys på alle systemer. Du går videre. Ingen papirlappproblem. Ingen feil fra i går å rette opp.", time: "+1 min · Alt stemmer" }
+      ]
+    },
+    {
+      time: "01:30",
+      tag: "SITUASJON 4 · ALARM",
+      text: "Alarm fra rom 7. Pasienten er ok men trenger ekstra oppfølging. Du varsler legen og oppdaterer behandlingsplanen.",
+      choices: [
+        { text: "Send varsel direkte i plattformen", good: true, feedback: "Legen får notifikasjon med full kontekst — pasientens historikk, nåværende status, din observasjon. Han svarer på 3 minutter med oppdatert plan. Alt loggføres automatisk.", time: "+5 min · Sømløs koordinering" },
+        { text: "Oppdater behandlingsplanen direkte", good: true, feedback: "Endringen er synlig for hele teamet umiddelbart. Nattevakten på rommet ved siden av ser det og sjekker selv om pasienten vil ha selskap. Teamwork.", time: "+3 min · Hele teamet er med" }
+      ]
+    },
+    {
+      time: "05:45",
+      tag: "SITUASJON 5 · VAKTSKIFTE",
+      text: "Vakten er snart over. Overleveringen til dagvakten.",
+      choices: [
+        { text: "Del den automatiske vaktoppsummeringen", good: true, feedback: "Systemet har generert en fullstendig oppsummering av alle 8 pasienter — hendelser, statusendringer, oppgaver som gjenstår. Dagvakten har full oversikt på 2 minutter.", time: "+2 min · Ingenting glemt" },
+        { text: "Gå gjennom det som trengs ekstra oppmerksomhet", good: true, feedback: "Du bruker 8 minutter på å gå gjennom de to pasientene som trenger spesiell oppfølging. Alt annet er allerede dokumentert. Dagvakten starter trygt.", time: "+8 min · Fokusert og komplett" }
+      ]
+    }
+  ]
+};
+
+let currentYear = 'old';
+let currentScene = 0;
+let stress = 0;
+let timeWasted = 0;
+let choicesMade = [];
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startGame(year) {
+  currentYear = year;
+  currentScene = 0;
+  stress = year === 'old' ? 5 : 0;
+  timeWasted = 0;
+  choicesMade = [];
+  showScreen('game');
+
+  const badge = document.getElementById('yearBadge');
+  badge.textContent = year === 'old' ? '2022' : '2025';
+  badge.className = 'game-year-badge ' + (year === 'old' ? 'old' : 'new');
+
+  renderScene();
+}
+
+function renderProgressDots() {
+  const container = document.getElementById('progressDots');
+  const scenes = scenarios[currentYear];
+  container.innerHTML = scenes.map((_, i) => {
+    let cls = 'dot';
+    if (i < currentScene) cls += ' done';
+    if (i === currentScene) cls += ' current';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+}
+
+function updateStress() {
+  const fill = document.getElementById('stressFill');
+  const val = document.getElementById('stressVal');
+  const s = Math.min(100, stress);
+  fill.style.width = s + '%';
+  fill.style.background = s < 30 ? '#2dc653' : s < 60 ? '#ee9b00' : '#ae2012';
+  val.textContent = s + '%';
+}
+
+function renderScene() {
+  renderProgressDots();
+  updateStress();
+
+  const scene = scenarios[currentYear][currentScene];
+  document.getElementById('gameClock').textContent = scene.time;
+
+  const area = document.getElementById('sceneArea');
+  area.innerHTML = `
+    <div class="situation-card">
+      <div class="sit-tag">${scene.tag}</div>
+      <p class="sit-text">${scene.text}</p>
+    </div>
+    <div class="choices" id="choices">
+      ${scene.choices.map((c, i) => `
+        <button class="choice-btn" onclick="makeChoice(${i})">${c.text}</button>
+      `).join('')}
+    </div>
+    <div class="feedback-box" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextScene()">
+      ${currentScene < scenarios[currentYear].length - 1 ? 'Neste situasjon →' : 'Se resultatet →'}
+    </button>
+  `;
+}
+
+function makeChoice(idx) {
+  const scene = scenarios[currentYear][currentScene];
+  const choice = scene.choices[idx];
+  choicesMade.push(choice);
+
+  // Disable all buttons
+  document.querySelectorAll('.choice-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === idx) {
+      btn.classList.add(choice.good ? 'chosen-good' : 'chosen-bad');
+    }
+  });
+
+  // Show feedback
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback-box ' + (choice.good ? 'good' : 'bad');
+  fb.innerHTML = `${choice.feedback}<div class="feedback-time">${choice.time}</div>`;
+  fb.style.display = 'block';
+
+  // Update stress
+  if (currentYear === 'old') {
+    stress += choice.good ? 5 : 20;
+  } else {
+    stress = Math.max(0, stress + (choice.good ? -5 : 5));
+  }
+  updateStress();
+
+  // Extract time
+  const match = choice.time.match(/\+(\d+)\s*min/);
+  if (match) timeWasted += parseInt(match[1]);
+
+  document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextScene() {
+  currentScene++;
+  if (currentScene >= scenarios[currentYear].length) {
+    showEndScreen();
+  } else {
+    renderScene();
+    window.scrollTo(0,0);
+  }
+}
+
+function showEndScreen() {
+  showScreen('endscreen');
+
+  const isOld = currentYear === 'old';
+
+  document.getElementById('endHeader').textContent = isOld ? '2022 · VAKTEN ER OVER' : '2025 · VAKTEN ER OVER';
+
+  document.getElementById('endVerdict').innerHTML = isOld
+    ? 'Du overlevde vakten.<br><span style="color:var(--red)">Systemene gjorde det ikke lett.</span>'
+    : 'Du hadde en god vakt.<br><span style="color:var(--teal)">Teknologien holdt seg i bakgrunnen.</span>';
+
+  document.getElementById('endSummary').textContent = isOld
+    ? `Du brukte estimert ${timeWasted} minutter på systemkamp denne natten. Tid som ikke gikk til pasientene. Dette er ikke unntaket — dette er normen for tusenvis av sykepleiere hver eneste natt.`
+    : `Systemene jobbet for deg, ikke mot deg. Du brukte ${timeWasted} minutter på administrasjon. Resten gikk til pasientene. Slik skal det være.`;
+
+  const grid = document.getElementById('statsGrid');
+  if (isOld) {
+    grid.innerHTML = `
+      <div class="stat-box">
+        <div class="stat-num bad">${timeWasted}</div>
+        <div class="stat-label">minutter tapt på systemkamp</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num bad">${Math.min(100,stress)}%</div>
+        <div class="stat-label">stressnivå ved vaktens slutt</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num bad">3x</div>
+        <div class="stat-label">samme info registrert manuelt</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num bad">17</div>
+        <div class="stat-label">passord denne uken</div>
+      </div>
+    `;
+  } else {
+    grid.innerHTML = `
+      <div class="stat-box">
+        <div class="stat-num good">${timeWasted}</div>
+        <div class="stat-label">minutter på administrasjon</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num teal">${Math.max(0,stress)}%</div>
+        <div class="stat-label">stressnivå ved vaktens slutt</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num good">1x</div>
+        <div class="stat-label">registrering — synkronisert overalt</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num good">1</div>
+        <div class="stat-label">innlogging for alt</div>
+      </div>
+    `;
+  }
+}
+</script>
+</body>
+</html>
