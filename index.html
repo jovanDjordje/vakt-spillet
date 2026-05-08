@@ -556,11 +556,11 @@ html, body {
     <p class="yearsel-sub">Samme sykehus. Samme pasienter.<br>Veldig forskjellig natt.</p>
     <div class="year-cards">
       <div class="year-card old" onclick="startGame('old')">
-        <div class="year-num">2022</div>
+        <div class="year-num">2024</div>
         <div class="year-desc">Systemer som ikke snakker sammen</div>
       </div>
       <div class="year-card new" onclick="startGame('new')">
-        <div class="year-num">2025</div>
+        <div class="year-num">2030</div>
         <div class="year-desc">Prosessplattformen er på plass</div>
       </div>
     </div>
@@ -611,8 +611,8 @@ html, body {
   <div id="feedbackDone" class="feedback-sent" style="display:none">✓ TAKK — VI HAR MOTTATT DIN TILBAKEMELDING</div>
 
   <div class="replay-row">
-    <button class="btn-secondary" onclick="startGame('old')">Spill 2022</button>
-    <button class="btn-secondary" onclick="startGame('new')">Spill 2025</button>
+    <button class="btn-secondary" onclick="startGame('old')">Spill 2024</button>
+    <button class="btn-secondary" onclick="startGame('new')">Spill 2030</button>
   </div>
   <br>
   <button class="btn-primary" style="width:100%" onclick="showScreen('yearsel')">Prøv det andre året →</button>
@@ -737,7 +737,7 @@ function startGame(year) {
   showScreen('game');
 
   const badge = document.getElementById('yearBadge');
-  badge.textContent = year === 'old' ? '2022' : '2025';
+  badge.textContent = year === 'old' ? '2024' : '2030';
   badge.className = 'game-year-badge ' + (year === 'old' ? 'old' : 'new');
 
   renderScene();
@@ -861,7 +861,7 @@ function showEndScreen() {
 
   const isOld = currentYear === 'old';
 
-  document.getElementById('endHeader').textContent = isOld ? '2022 · VAKTEN ER OVER' : '2025 · VAKTEN ER OVER';
+  document.getElementById('endHeader').textContent = isOld ? '2024 · VAKTEN ER OVER' : '2030 · VAKTEN ER OVER';
 
   document.getElementById('endVerdict').innerHTML = isOld
     ? 'Du overlevde vakten.<br><span style="color:var(--red)">Systemene gjorde det ikke lett.</span>'
