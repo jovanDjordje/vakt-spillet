@@ -517,6 +517,22 @@ html, body {
   border: 1px solid rgba(45,198,83,0.2);
 }
 
+/* ── SCENE IMAGE ── */
+.scene-img-wrap {
+  margin: -1.2rem -1.2rem 1rem;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  height: 160px;
+  background: var(--mid);
+}
+.scene-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  image-rendering: pixelated;
+}
+
 /* ── PROGRESS DOTS ── */
 .progress-dots {
   display: flex;
@@ -624,46 +640,51 @@ const scenarios = {
     {
       time: "22:47",
       tag: "SITUASJON 1 · INNLOGGING",
-      text: "Du starter vakten. Du trenger tilgang til pasientjournaler, medisinsystemet og arbeidsplanen. Tre forskjellige systemer. Tre forskjellige passord.",
+      image: "2024-login.png",
+      text: "Du kommer tilbake til vaktrommet etter en pasientrunde. En annen sykepleier er logget på PC-en du satt ved. Du trenger å sjekke noe kjapt — ett system for journalen, ett for medisiner, ett for bestillinger.",
       choices: [
-        { text: "Logg inn i alle tre — ett om gangen", good: false, feedback: "Du bruker 14 minutter på innlogging og passordproblemer. System 2 har tidsavbrutt. Du starter på nytt. En kollega venter på informasjon du ikke har funnet ennå.", time: "+14 min · Stressnivå opp" },
-        { text: "Bruk post-it-lappen med passordene på skjermen", good: false, feedback: "Det funker — denne gangen. Men det er ikke akkurat GDPR-vennlig. Og neste uke bytter IT passordene uansett.", time: "+8 min · Sikkerhetsrisiko" }
+        { text: "Vent til kollegaen er ferdig", good: false, feedback: "Du venter 9 minutter. I mellomtiden ringer telefonen to ganger med spørsmål du ikke kan svare på uten tilgang til systemet. Pasienten på rom 3 venter fortsatt på svar.", time: "+9 min · Pasienten venter" },
+        { text: "Finn en ledig PC og logg inn på nytt", good: true, feedback: "Du finner en ledig maskin i enden av gangen. Fire minutter med ny innlogging. Pasientlisten du hadde oppe er borte — du starter fra scratch. Ingen krise, men unødvendig friksjon hver eneste vakt.", time: "+4 min · Kontekst tapt, starter på nytt" }
       ]
     },
     {
       time: "23:15",
-      tag: "SITUASJON 2 · PASIENTINFO",
-      text: "Pasient på rom 4 skal ha medisin. Du trenger å sjekke allergier fra forrige innleggelse på et annet sykehus. Informasjonen finnes — men ikke her.",
+      tag: "SITUASJON 2 · MEDISIN",
+      image: "2024-patient.png",
+      text: "Pasient på rom 4 skal ha smertestillende. Du trenger å sjekke om pasienten har allergier fra en innleggelse på et annet sykehus. Systemene snakker ikke sammen.",
       choices: [
-        { text: "Ring nattevakten på det andre sykehuset", good: false, feedback: "Du venter 11 minutter. Sykepleieren der finner det til slutt i et gammelt papirarkiv. Pasienten har ventet på smertestillende hele tiden.", time: "+11 min · Pasient venter" },
-        { text: "Spør pasienten selv om allergier", good: false, feedback: "Pasienten husker ikke nøyaktig. Du dokumenterer det som uavklart og gir ikke medisinen denne runden. Det er det tryggeste — men ikke det beste.", time: "+5 min · Usikkerhet" }
+        { text: "Spør pasienten direkte og dokumenter som uavklart", good: true, feedback: "Pasienten husker ikke sikkert. Du noterer uavklart, kontakter legen for å være sikker, og utsetter medisinen. Prosedyren er fulgt — men pasienten venter, og du vet ikke om informasjonen stemmer.", time: "+6 min · Forsinkelse, usikker dokumentasjon" },
+        { text: "Ring nattevakten på det andre sykehuset", good: false, feedback: "Du venter 11 minutter i telefonen. Nattevakten der finner det ikke i systemet — de lover å fakse noe i morgen. Du gir ikke medisinen. Pasienten sover ikke.", time: "+11 min · Uavklart, pasient uten medisin" }
       ]
     },
     {
       time: "23:58",
-      tag: "SITUASJON 3 · DOBBELTREGISTRERING",
-      text: "Du har oppdatert en pasients status. Nå må det samme inn i tre systemer — journal, medisinsystem og avdelingslogg. Manuelt.",
+      tag: "SITUASJON 3 · REGISTRERING",
+      image: "2024-dobbel.png",
+      text: "En pasients tilstand har endret seg. Oppdateringen må inn i ett system for journalen, ett for medisiner og ett for bestillinger. Ingen av dem snakker med hverandre.",
       choices: [
-        { text: "Skriv det inn i alle tre systemene", good: false, feedback: "22 minutter. Du skriver det samme tre ganger. I det tredje systemet oppdager du at noen har lagt inn feil informasjon fra i går. Du må rette opp. Telefonen ringer.", time: "+22 min · Frustrasjon" },
-        { text: "Oppdater bare journalen — de andre kan vente", good: false, feedback: "Neste vakt finner inkonsekvente opplysninger. Det tar en time å rydde opp. Du vet ikke at det skjer — du sover.", time: "+3 min nå, +60 min for neste vakt" }
+        { text: "Oppdater det viktigste systemet og flagg resten", good: true, feedback: "Du tar journalen og lar de to andre vente. Neste vakt vil finne inkonsekvente opplysninger — men du valgte riktig prioritering akkurat nå. Det er ikke bra. Det er bare det minst dårlige.", time: "+5 min · Problem utsatt til neste vakt" },
+        { text: "Oppdater alle tre manuelt", good: false, feedback: "20 minutter. Du skriver det samme tre ganger. Halvveis inn oppdager du at noen la inn feil info i går. Du retter opp. Telefonen ringer mens du skriver. Du mister tråden og starter på nytt.", time: "+20 min · Feil oppdaget, konsentrasjon brutt" }
       ]
     },
     {
       time: "01:30",
       tag: "SITUASJON 4 · ALARM",
-      text: "Alarm fra rom 7. Du løper dit. Pasienten er ok — men trenger ekstra oppfølging. Du trenger å varsle legen og oppdatere behandlingsplanen.",
+      image: "2024-alarm.png",
+      text: "Alarm fra rom 7. Pasienten er stabil, men trenger ekstra oppfølging. Du må varsle legen — han bruker et annet system enn deg, og dere ser ikke det samme.",
       choices: [
-        { text: "Ring legen, oppdater begge systemer manuelt", good: false, feedback: "Legen trenger informasjon fra to systemer du ikke har åpne. Du leser opp fra skjerm, han noterer på papir. Han sier han oppdaterer journalen selv. Han glemmer det.", time: "+18 min · Koordineringsfeil" },
-        { text: "Send melding i systemet og håp at legen ser det", good: false, feedback: "Legen bruker et annet system. Meldingen havner i en innboks han sjekker morgen. Du finner ut ved 06:00.", time: "+2 min nå, problem oppdages ved 06:00" }
+        { text: "Send melding i systemet og ring etterpå for å bekrefte", good: true, feedback: "Meldingen havner i en innboks legen sjekker av og til. Du ringer uansett for å være sikker. Han bekrefter. Det tok dobbelt så lang tid som det burde — men det gikk.", time: "+12 min · Dobbelt arbeid, men bekreftet" },
+        { text: "Ring legen og la ham notere på papir", good: false, feedback: "Legen noterer. Dere er begge i hvert sitt system. Han sier han oppdaterer journalen selv. Han glemmer det. Du finner ut av det ved 05:00 under vaktskiftet.", time: "+18 min · Koordineringsfeil, oppdages 05:00" }
       ]
     },
     {
       time: "05:45",
       tag: "SITUASJON 5 · VAKTSKIFTE",
-      text: "Vakten er snart over. Du skal overleverere til dagvakten. Du har informasjon spredt over tre systemer, noen papirlapper og hukommelsen.",
+      image: "2024-skifte.png",
+      text: "Vakten er over. Notatene dine ligger spredt — noe i systemet, noe på papir, noe bare i hodet. Dagvakten møter opp om ti minutter.",
       choices: [
-        { text: "Muntlig gjennomgang av alle 8 pasienter", good: false, feedback: "35 minutter. Du er utslitt og glemmer to viktige detaljer. Dagvakten oppdager dem — heldigvis — etter en time.", time: "+35 min · Kritisk info nesten tapt" },
-        { text: "Send en e-post med oppsummeringen", good: false, feedback: "E-posten er ufullstendig fordi du ikke orker å lete opp alt fra alle systemene. Du håper dagvakten spør hvis noe er uklart.", time: "+20 min · Ufullstendig overleveringn" }
+        { text: "Skriv en rask oppsummering på e-post og send", good: true, feedback: "Du sender det du rekker å huske. E-posten er ufullstendig — dagvakten starter med spørsmål du ikke har svart på. Det funker. Men det er ikke en god overlevering.", time: "+12 min · Ufullstendig, hull i overleveringen" },
+        { text: "Muntlig gjennomgang av alle 8 pasienter fra hukommelsen", good: false, feedback: "35 minutter. Utslitt og stresset glemmer du to detaljer. Dagvakten oppdager dem en time inn i vakten — heldigvis før noe gikk galt. Men det var nære.", time: "+35 min · Kritisk info nesten tapt" }
       ]
     }
   ],
@@ -671,46 +692,51 @@ const scenarios = {
     {
       time: "22:47",
       tag: "SITUASJON 1 · INNLOGGING",
-      text: "Du starter vakten. Du trenger tilgang til pasientjournaler, medisinsystemet og arbeidsplanen.",
+      image: "2030-login.png",
+      text: "Du starter vakten. Du logger inn.",
       choices: [
-        { text: "Logg inn med din ene brukerkonto", good: true, feedback: "Én innlogging. Alt er der. Pasientliste, medisiner, arbeidsplan — alt i ett grensesnitt. Du er klar på 90 sekunder.", time: "+1.5 min · Stress: null" },
-        { text: "Sjekk at alt ser riktig ut før du starter", good: true, feedback: "Du bruker 2 minutter på å bekrefte at alt er oppdatert fra forrige vakt. Det er. Du starter trygt.", time: "+2 min · Full oversikt" }
+        { text: "Én innlogging — alt er der", good: true, feedback: "Pasientliste, medisiner, bestillinger, arbeidsplan — alt i ett grensesnitt. Du er klar på 90 sekunder. Ingen post-it. Ingen tidsavbrudd. Du begynner vakten med full oversikt.", time: "+1.5 min · Klar fra første sekund" },
+        { text: "Sjekk at overleveringen fra forrige vakt ser riktig ut", good: true, feedback: "Alt er oppdatert og strukturert. Du ser én pasient som trenger ekstra oppmerksomhet i natt — flagget automatisk. Du hadde ikke visst det uten dette. Du starter trygt og forberedt.", time: "+2 min · Forberedt, ingen overraskelser" }
       ]
     },
     {
       time: "22:55",
-      tag: "SITUASJON 2 · PASIENTINFO",
-      text: "Pasient på rom 4 skal ha medisin. Du trenger å sjekke allergier fra forrige innleggelse på et annet sykehus.",
+      tag: "SITUASJON 2 · MEDISIN",
+      image: "2030-patient.png",
+      text: "Pasient på rom 4 skal ha smertestillende. Du sjekker allergier.",
       choices: [
-        { text: "Slå opp i pasientprofilen", good: true, feedback: "Alt er der. Allergier, tidligere innleggelser, nåværende medisiner — samlet fra alle relevante systemer. Du gir medisinen trygt. Pasienten slipper å vente.", time: "+2 min · Trygg og rask" },
-        { text: "Dobbeltsjekk med den automatiske varslingen", good: true, feedback: "Systemet har allerede flagget en mulig interaksjon mellom to medisiner. Du ser det, ringer legen, justerer dosen. Det kunne gått galt.", time: "+4 min · Potensielt liv reddet" }
+        { text: "Slå opp i pasientprofilen", good: true, feedback: "Allergier, tidligere innleggelser, nåværende medisiner — samlet automatisk fra alle relevante sykehus. Du gir medisinen trygt. Pasienten slipper å vente. Du slipper å ringe noen.", time: "+2 min · Trygt og raskt" },
+        { text: "Se om systemet har flagget noe automatisk", good: true, feedback: "Systemet har allerede oppdaget en mulig interaksjon mellom to medisiner og varslet deg. Du ringer legen, justerer dosen. Uten flagget hadde du ikke visst. Det kunne gått galt.", time: "+4 min · Potensielt liv reddet" }
       ]
     },
     {
       time: "23:20",
-      tag: "SITUASJON 3 · OPPDATERING",
-      text: "Du har oppdatert en pasients status. Det skal reflekteres i journal, medisinsystem og avdelingslogg.",
+      tag: "SITUASJON 3 · REGISTRERING",
+      image: "2030-oppdatering.png",
+      text: "En pasients tilstand har endret seg. Du oppdaterer.",
       choices: [
-        { text: "Oppdater én gang i plattformen", good: true, feedback: "Én oppdatering. Systemet synkroniserer automatisk til alle relevante steder. 90 sekunder. Du er ferdig.", time: "+1.5 min · Ingen dobbeltregistrering" },
-        { text: "Sjekk at synkroniseringen gikk ok", good: true, feedback: "Grønt lys på alle systemer. Du går videre. Ingen papirlappproblem. Ingen feil fra i går å rette opp.", time: "+1 min · Alt stemmer" }
+        { text: "Én oppdatering i plattformen", good: true, feedback: "Systemet synkroniserer automatisk. Journal, medisinliste, bestillinger — alt oppdatert på 90 sekunder. Du er ferdig. Ingen dobbeltregistrering. Ingen risiko for at noen ser feil versjon.", time: "+1.5 min · Synkronisert overalt" },
+        { text: "Sjekk at alt gikk gjennom", good: true, feedback: "Grønt lys på alle steder. Du ser at en kollega allerede har sett oppdateringen og lagt til en kommentar. Teamet jobber fra samme kilde. Du går videre.", time: "+1 min · Alt stemmer, teamet er med" }
       ]
     },
     {
       time: "01:30",
       tag: "SITUASJON 4 · ALARM",
-      text: "Alarm fra rom 7. Pasienten er ok men trenger ekstra oppfølging. Du varsler legen og oppdaterer behandlingsplanen.",
+      image: "2030-alarm.png",
+      text: "Alarm fra rom 7. Pasienten er stabil, men trenger ekstra oppfølging. Du varsler legen.",
       choices: [
-        { text: "Send varsel direkte i plattformen", good: true, feedback: "Legen får notifikasjon med full kontekst — pasientens historikk, nåværende status, din observasjon. Han svarer på 3 minutter med oppdatert plan. Alt loggføres automatisk.", time: "+5 min · Sømløs koordinering" },
-        { text: "Oppdater behandlingsplanen direkte", good: true, feedback: "Endringen er synlig for hele teamet umiddelbart. Nattevakten på rommet ved siden av ser det og sjekker selv om pasienten vil ha selskap. Teamwork.", time: "+3 min · Hele teamet er med" }
+        { text: "Send varsel i plattformen", good: true, feedback: "Legen får notifikasjon med full kontekst — pasienthistorikk, nåværende status, din observasjon. Han svarer på 3 minutter med oppdatert plan. Alt loggføres automatisk. Ingen papirnotater. Ingen glemte oppdateringer.", time: "+5 min · Sømløs koordinering" },
+        { text: "Oppdater behandlingsplanen direkte", good: true, feedback: "Endringen er synlig for hele teamet med én gang. Kollegaen på naborommet ser det og stikker innom pasienten for å sjekke. Ingen koordinering nødvendig — systemet gjør det for dere.", time: "+3 min · Hele teamet er med, automatisk" }
       ]
     },
     {
       time: "05:45",
       tag: "SITUASJON 5 · VAKTSKIFTE",
-      text: "Vakten er snart over. Overleveringen til dagvakten.",
+      image: "2030-skifte.png",
+      text: "Vakten er over. Dagvakten møter opp.",
       choices: [
-        { text: "Del den automatiske vaktoppsummeringen", good: true, feedback: "Systemet har generert en fullstendig oppsummering av alle 8 pasienter — hendelser, statusendringer, oppgaver som gjenstår. Dagvakten har full oversikt på 2 minutter.", time: "+2 min · Ingenting glemt" },
-        { text: "Gå gjennom det som trengs ekstra oppmerksomhet", good: true, feedback: "Du bruker 8 minutter på å gå gjennom de to pasientene som trenger spesiell oppfølging. Alt annet er allerede dokumentert. Dagvakten starter trygt.", time: "+8 min · Fokusert og komplett" }
+        { text: "Del den automatiske vaktoppsummeringen", good: true, feedback: "Systemet har generert en fullstendig rapport — alle 8 pasienter, hendelser, statusendringer, gjenstående oppgaver. Dagvakten har full oversikt på 2 minutter. Ingenting er glemt. Du går hjem.", time: "+2 min · Komplett, ingenting glemt" },
+        { text: "Gå gjennom de to pasientene som trenger ekstra oppmerksomhet", good: true, feedback: "Alt annet er allerede dokumentert. Du bruker 8 minutter på det som faktisk trenger et menneske — nuansen, bekymringen du ikke rakk å skrive ned. Dagvakten starter trygt og informert.", time: "+8 min · Fokusert, menneskelig touch" }
       ]
     }
   ]
@@ -773,6 +799,7 @@ function renderScene() {
   const area = document.getElementById('sceneArea');
   area.innerHTML = `
     <div class="situation-card">
+      ${scene.image ? `<div class="scene-img-wrap"><img class="scene-img" src="assets/${scene.image}" alt="" onerror="this.parentElement.style.display='none'"></div>` : ''}
       <div class="sit-tag">${scene.tag}</div>
       <p class="sit-text">${scene.text}</p>
     </div>
