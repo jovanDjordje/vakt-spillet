@@ -524,6 +524,8 @@ html, body {
   overflow: hidden;
   background: var(--mid);
   position: relative;
+  display: flex;
+  justify-content: center;
 }
 .scene-img-wrap::after {
   content: '';
@@ -535,12 +537,20 @@ html, body {
 .scene-img {
   width: 100%;
   aspect-ratio: 16/9;
-  max-height: 30vh;
   object-fit: cover;
   display: block;
   image-rendering: auto;
   animation: kenburns 16s ease-out forwards;
   transform-origin: center center;
+}
+@media (min-width: 600px) {
+  .scene-img {
+    width: auto;
+    height: 36vh;
+    max-width: 100%;
+    aspect-ratio: auto;
+    object-fit: initial;
+  }
 }
 @keyframes kenburns {
   from { transform: scale(1.06) translate(0%, 0%); }
