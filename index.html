@@ -523,13 +523,28 @@ html, body {
   border-radius: 12px 12px 0 0;
   overflow: hidden;
   background: var(--mid);
+  position: relative;
+}
+.scene-img-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, var(--panel) 100%);
+  pointer-events: none;
 }
 .scene-img {
   width: 100%;
   aspect-ratio: 16/9;
+  max-height: 30vh;
   object-fit: cover;
   display: block;
   image-rendering: auto;
+  animation: kenburns 16s ease-out forwards;
+  transform-origin: center center;
+}
+@keyframes kenburns {
+  from { transform: scale(1.06) translate(0%, 0%); }
+  to   { transform: scale(1.13) translate(-2%, -1%); }
 }
 
 /* ── PROGRESS DOTS ── */
