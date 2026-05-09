@@ -320,6 +320,48 @@ html, body {
   color: #ff8a7a;
 }
 
+.facts-block {
+  background: var(--mid);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.2rem;
+  margin: 0.5rem 0;
+}
+.facts-block-title {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.75rem;
+}
+.facts-block ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.facts-block li {
+  font-size: 0.82rem;
+  color: var(--cream);
+  line-height: 1.5;
+  padding-left: 1rem;
+  position: relative;
+}
+.facts-block li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--teal);
+}
+.facts-block-source {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--muted);
+}
+
 .feedback-box {
   background: var(--mid);
   border-radius: 10px;
@@ -634,6 +676,8 @@ html, body {
 
   <div class="stats-grid" id="statsGrid"></div>
 
+  <div class="facts-block" id="factsBlock" style="display:none"></div>
+
   <div class="values-reveal">
     <div class="values-title">DETTE ER DERFOR VI BYGGER DET</div>
     <div class="value-item"><div class="value-dot"></div><div>Vi nekter å akseptere at teknologi skal gjøre jobben vanskeligere</div></div>
@@ -695,10 +739,10 @@ const scenarios = {
       time: "01:30",
       tag: "SITUASJON 4 · ALARM",
       image: "2024-alarm.png",
-      text: "Alarm fra rom 7. Pasienten er stabil, men trenger ekstra oppfølging. Du må varsle legen — han bruker et annet system enn deg, og dere ser ikke det samme.",
+      text: "Alarm fra rom 7. Pasienten er stabil, men trenger ekstra oppfølging. Du sender en melding til ansvarlig lege via journalsystemet. Legen er opptatt med en annen pasient — og har 24 uleste meldinger i innboksen.",
       choices: [
-        { text: "Send melding i systemet og ring etterpå for å bekrefte", good: true, feedback: "Meldingen havner i en innboks legen sjekker av og til. Du ringer uansett for å være sikker. Han bekrefter. Det tok dobbelt så lang tid som det burde — men det gikk.", time: "+12 min · Dobbelt arbeid, men bekreftet" },
-        { text: "Ring legen og la ham notere på papir", good: false, feedback: "Legen noterer. Dere er begge i hvert sitt system. Han sier han oppdaterer journalen selv. Han glemmer det. Du finner ut av det ved 05:00 under vaktskiftet.", time: "+18 min · Koordineringsfeil, oppdages 05:00" }
+        { text: "Ring legen direkte for å forsikre deg om at han har sett meldingen", good: true, feedback: "Legen tar telefonen. Du gjentar det du allerede har skrevet i systemet. Han bekrefter og oppdaterer behandlingsplanen. Dobbelt arbeid — men du vet at beskjeden gikk gjennom.", time: "+12 min · Dobbeltarbeid, men bekreftet" },
+        { text: "La meldingen stå — han ser den snart", good: false, feedback: "Legen ser meldingen 24 minutter etter. Han oppdaterer planen. Alt er i orden — men pasienten på rom 7 lå uten avklart oppfølging i nesten en halvtime.", time: "+24 min · For sen respons, pasienten uten avklaring" }
       ]
     },
     {
@@ -921,6 +965,22 @@ function showEndScreen() {
   document.getElementById('endSummary').textContent = isOld
     ? `Du brukte estimert ${timeWasted} minutter på systemkamp denne natten. Tid som ikke gikk til pasientene. Dette er ikke unntaket — dette er normen for tusenvis av sykepleiere hver eneste natt.`
     : `Systemene jobbet for deg, ikke mot deg. Du brukte ${timeWasted} minutter på administrasjon. Resten gikk til pasientene. Slik skal det være.`;
+
+  const factsBlock = document.getElementById('factsBlock');
+  if (isOld) {
+    factsBlock.style.display = 'block';
+    factsBlock.innerHTML = `
+      <div class="facts-block-title">Dette er ikke fiksjon</div>
+      <ul>
+        <li>Norske sykepleiere bruker i snitt 2 timer per vakt på elektroniske journalsystemer</li>
+        <li>77 % sier dette går direkte ut over pasientene</li>
+        <li>17 % av sykepleierens arbeidstid kunne vært frigjort med bedre systemer</li>
+      </ul>
+      <div class="facts-block-source">Kilde: Sykepleien / Oslo Economics, 2024–2025</div>
+    `;
+  } else {
+    factsBlock.style.display = 'none';
+  }
 
   const grid = document.getElementById('statsGrid');
   if (isOld) {
