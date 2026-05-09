@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>En vakt på sykehuset — QR</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0f14;
+  color: #e8e0d0;
+  font-family: 'Syne', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.label {
+  font-size: clamp(0.7rem, 2vw, 0.85rem);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(232,224,208,0.4);
+}
+
+.title {
+  font-size: clamp(1.6rem, 5vw, 2.8rem);
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.title .accent { color: #0a9396; }
+
+#qrcode {
+  background: #fff;
+  padding: 1.2rem;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.url {
+  font-family: 'DM Mono', monospace;
+  font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+  color: #0a9396;
+  letter-spacing: 0.04em;
+}
+</style>
+</head>
+<body>
+
+<div class="label">Scan for å spille</div>
+
+<div class="title">En vakt på<br><span class="accent">sykehuset</span></div>
+
+<div id="qrcode"></div>
+
+<div class="url">vakt-spillet.vercel.app</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  const size = Math.min(Math.round(Math.min(window.innerWidth, window.innerHeight) * 0.45), 400);
+  new QRCode(document.getElementById('qrcode'), {
+    text: 'https://vakt-spillet.vercel.app',
+    width: size,
+    height: size,
+    colorDark: '#000000',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+</script>
+</body>
+</html>
