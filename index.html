@@ -569,6 +569,18 @@ html, body {
   display: flex;
   justify-content: center;
 }
+.scene-img-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  mix-blend-mode: overlay;
+  animation: grain-shift 0.18s steps(1) infinite;
+}
 .scene-img-wrap::after {
   content: '';
   position: absolute;
@@ -582,7 +594,6 @@ html, body {
   object-fit: cover;
   display: block;
   image-rendering: auto;
-  animation: kenburns 16s ease-out forwards;
   transform-origin: center center;
 }
 @media (min-width: 600px) {
@@ -594,9 +605,28 @@ html, body {
     object-fit: initial;
   }
 }
-@keyframes kenburns {
-  from { transform: scale(1.06) translate(0%, 0%); }
-  to   { transform: scale(1.13) translate(-2%, -1%); }
+@keyframes kenburns-0 { from { transform: scale(1.06) translate(0%,0%);   } to { transform: scale(1.13) translate(-2%,-1%); } }
+@keyframes kenburns-1 { from { transform: scale(1.06) translate(2%,1%);   } to { transform: scale(1.13) translate(0%,-2%);  } }
+@keyframes kenburns-2 { from { transform: scale(1.06) translate(-1%,1%);  } to { transform: scale(1.13) translate(1%,-1%);  } }
+@keyframes kenburns-3 { from { transform: scale(1.06) translate(1%,-1%);  } to { transform: scale(1.13) translate(-1%,2%);  } }
+@keyframes kenburns-4 { from { transform: scale(1.06) translate(-2%,0%);  } to { transform: scale(1.13) translate(2%,-2%);  } }
+@keyframes grain-shift {
+  0%   { background-position:   0px   0px; }
+  14%  { background-position: -15px -30px; }
+  28%  { background-position: -40px  15px; }
+  42%  { background-position:  20px -65px; }
+  56%  { background-position: -15px  65px; }
+  70%  { background-position: -45px  30px; }
+  84%  { background-position:  40px   0px; }
+  100% { background-position:  25px -35px; }
+}
+@keyframes flicker {
+  0%,100% { filter: brightness(1);    }
+  8%      { filter: brightness(0.97); }
+  20%     { filter: brightness(1);    }
+  55%     { filter: brightness(0.98); }
+  70%     { filter: brightness(1);    }
+  85%     { filter: brightness(0.96); }
 }
 
 /* ── PROGRESS DOTS ── */
@@ -867,7 +897,7 @@ function renderScene() {
   const area = document.getElementById('sceneArea');
   area.innerHTML = `
     <div class="situation-card">
-      ${scene.image ? `<div class="scene-img-wrap"><img class="scene-img" src="assets/${scene.image}" alt="" onerror="this.parentElement.style.display='none'"></div>` : ''}
+      ${scene.image ? `<div class="scene-img-wrap"><img class="scene-img" style="animation: kenburns-${currentScene % 5} 16s ease-out forwards${currentYear === 'old' ? ', flicker 6s ease-in-out infinite' : ''};" src="assets/${scene.image}" alt="" onerror="this.parentElement.style.display='none'"></div>` : ''}
       <div class="sit-tag">${scene.tag}</div>
       <p class="sit-text">${scene.text}</p>
     </div>
